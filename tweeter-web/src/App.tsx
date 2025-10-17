@@ -14,11 +14,11 @@ import UserItemScroller from "./components/mainLayout/UserItemScroller";
 import StatusItemScroller from "./components/mainLayout/StatusItemScroller";
 import { useUserInfo } from "./components/userInfo/UserHooks";
 import { FolloweePresenter } from "./presenter/FolloweePresenter";
-import { UserItemView } from "./presenter/UserItemPresenter";
 import { FollowerPresenter } from "./presenter/FollowerPresenter";
-import { StatusItemView } from "./presenter/StatusItemPresenter";
 import { FeedPresenter } from "./presenter/FeedPresenter";
 import { StoryPresenter } from "./presenter/StoryPresenter";
+import { Status, User } from "tweeter-shared";
+import { PagedItemView } from "./presenter/PagedItemPresenter";
 
 const App = () => {
   const { currentUser, authToken } = useUserInfo();
@@ -44,26 +44,6 @@ const App = () => {
 const AuthenticatedRoutes = () => {
   const { displayedUser } = useUserInfo();
 
-  // const loadMoreFeedItems = async (
-  //   authToken: AuthToken,
-  //   userAlias: string,
-  //   pageSize: number,
-  //   lastItem: Status | null
-  // ): Promise<[Status[], boolean]> => {
-  //   // TODO: Replace with the result of calling server
-  //   return FakeData.instance.getPageOfStatuses(lastItem, pageSize);
-  // };
-
-  // const loadMoreStoryItems = async (
-  //   authToken: AuthToken,
-  //   userAlias: string,
-  //   pageSize: number,
-  //   lastItem: Status | null
-  // ): Promise<[Status[], boolean]> => {
-  //   // TODO: Replace with the result of calling server
-  //   return FakeData.instance.getPageOfStatuses(lastItem, pageSize);
-  // };
-
   return (
     <Routes>
       <Route element={<MainLayout />}>
@@ -76,7 +56,7 @@ const AuthenticatedRoutes = () => {
           element={
             <StatusItemScroller
               featureUrl="/feed"
-              presenterFactory={(view: StatusItemView) =>
+              presenterFactory={(view: PagedItemView<Status>) =>
                 new FeedPresenter(view)
               }
             />
@@ -87,7 +67,7 @@ const AuthenticatedRoutes = () => {
           element={
             <StatusItemScroller
               featureUrl="/story"
-              presenterFactory={(view: StatusItemView) =>
+              presenterFactory={(view: PagedItemView<Status>) =>
                 new StoryPresenter(view)
               }
             />
@@ -99,7 +79,7 @@ const AuthenticatedRoutes = () => {
           element={
             <UserItemScroller
               featureUrl="/followees"
-              presenterFactory={(view: UserItemView) =>
+              presenterFactory={(view: PagedItemView<User>) =>
                 new FolloweePresenter(view)
               }
             />
@@ -111,7 +91,7 @@ const AuthenticatedRoutes = () => {
           element={
             <UserItemScroller
               featureUrl="/followers"
-              presenterFactory={(view: UserItemView) =>
+              presenterFactory={(view: PagedItemView<User>) =>
                 new FollowerPresenter(view)
               }
             />

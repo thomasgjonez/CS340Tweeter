@@ -1,19 +1,18 @@
 import { AuthToken, User } from "tweeter-shared";
 import { UserService } from "../model.service/UserService";
+import { Presenter, View } from "./Presenter";
 
-interface UserNavigationView {
+interface UserNavigationView extends View {
   navigateTo(path: string): void;
-  displayErrorMessage(message: string): void;
   setDisplayedUser(user: User): void;
 }
 
-export class UserNavigationPresenter {
-  private view: UserNavigationView;
+export class UserNavigationPresenter extends Presenter<UserNavigationView> {
   private featurePath: string;
   private service: UserService;
 
   public constructor(view: UserNavigationView, featurePath: string) {
-    this.view = view;
+    super(view);
     this.featurePath = featurePath;
     this.service = new UserService();
   }
@@ -24,8 +23,7 @@ export class UserNavigationPresenter {
     displayedUser: User | null
   ): Promise<void> {
     event.preventDefault();
-
-    try {
+    await this.doFailureReportingOperation(async () => {
       if (!authToken) throw new Error("Missing auth token");
 
       const alias = this.extractAlias(event.target?.toString() ?? "");
@@ -35,9 +33,7 @@ export class UserNavigationPresenter {
         this.view.setDisplayedUser(toUser);
         this.view.navigateTo(`${this.featurePath}/${toUser.alias}`);
       }
-    } catch (error) {
-      this.view.displayErrorMessage(`Failed to get user: ${error}`);
-    }
+    }, "get user");
   }
 
   private extractAlias(value: string): string {
