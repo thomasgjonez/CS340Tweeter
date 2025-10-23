@@ -1,10 +1,14 @@
 import "./PostStatus.css";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useMessageActions } from "../toaster/MessageHooks";
 import { useUserInfo } from "../userInfo/UserHooks";
 import { PostStatusPresenter } from "../../presenter/PostStatusPresenter";
 
-const PostStatus = () => {
+interface Props {
+  presenter?: PostStatusPresenter;
+}
+
+const PostStatus = (props: Props) => {
   const { displayInfoMessage, displayErrorMessage, deleteMessage } =
     useMessageActions();
 
@@ -12,13 +16,18 @@ const PostStatus = () => {
   const [post, setPost] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const presenter = new PostStatusPresenter({
-    setIsLoading,
-    setPostText: setPost,
-    displayInfoMessage,
-    displayErrorMessage,
-    deleteMessage,
-  });
+  const presenterRef = useRef<PostStatusPresenter | null>(null);
+  if (!presenterRef.current) {
+    presenterRef.current =
+      props.presenter ??
+      new PostStatusPresenter({
+        setIsLoading,
+        setPostText: setPost,
+        displayInfoMessage,
+        displayErrorMessage,
+        deleteMessage,
+      });
+  }
 
   const checkButtonStatus: () => boolean = () => {
     return !post.trim() || !authToken || !currentUser;
@@ -30,6 +39,7 @@ const PostStatus = () => {
         <textarea
           className="form-control"
           id="postStatusTextArea"
+          aria-label="postStatusTextArea"
           rows={10}
           placeholder="What's on your mind?"
           value={post}
@@ -44,10 +54,11 @@ const PostStatus = () => {
           className="btn btn-md btn-primary me-1"
           type="button"
           disabled={checkButtonStatus()}
+          aria-label="postStatusButton"
           style={{ width: "8em" }}
           onClick={(event) => {
             event.preventDefault();
-            presenter.submitStatus(post, currentUser!, authToken!);
+            presenterRef.current!.submitStatus(post, currentUser!, authToken!);
           }}
         >
           {isLoading ? (
@@ -65,9 +76,10 @@ const PostStatus = () => {
           className="btn btn-md btn-secondary"
           type="button"
           disabled={checkButtonStatus()}
+          aria-label="clearStatusButton"
           onClick={(event) => {
             event.preventDefault();
-            presenter.clearPost();
+            presenterRef.current!.clearPost();
           }}
         >
           Clear

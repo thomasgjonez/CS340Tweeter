@@ -1,6 +1,6 @@
 import "./Register.css";
 import "bootstrap/dist/css/bootstrap.css";
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import AuthenticationFormLayout from "../AuthenticationFormLayout";
 import AuthFields from "../authenticationFields/authFields";
@@ -23,16 +23,19 @@ const Register = () => {
   const { updateUserInfo } = useUserInfoActions();
   const { displayErrorMessage } = useMessageActions();
 
-  const presenter = new RegisterPresenter({
-    setIsLoading,
-    displayErrorMessage,
-    updateUserInfo: (user, authToken, remember) =>
-      updateUserInfo(user, user, authToken, remember),
-    navigateTo: (path: string) => navigate(path),
-  });
+  const presenterRef = useRef<RegisterPresenter | null>(null);
+  if (!presenterRef.current) {
+    presenterRef.current = new RegisterPresenter({
+      setIsLoading,
+      displayErrorMessage,
+      updateUserInfo: (user, authToken, remember) =>
+        updateUserInfo(user, user, authToken, remember),
+      navigateTo: (path: string) => navigate(path),
+    });
+  }
 
   const checkSubmitButtonStatus = (): boolean => {
-    return presenter.isSubmitDisabled(
+    return presenterRef.current!.isSubmitDisabled(
       firstName,
       lastName,
       alias,
@@ -44,7 +47,7 @@ const Register = () => {
 
   const registerOnEnter = (event: React.KeyboardEvent<HTMLElement>) => {
     if (event.key == "Enter" && !checkSubmitButtonStatus()) {
-      presenter.doRegister(
+      presenterRef.current!.doRegister(
         firstName,
         lastName,
         alias,
@@ -58,7 +61,7 @@ const Register = () => {
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    presenter.handleImageFile(
+    presenterRef.current!.handleImageFile(
       file,
       setImageUrl,
       setImageBytes,
@@ -138,7 +141,7 @@ const Register = () => {
       submitButtonDisabled={checkSubmitButtonStatus}
       isLoading={isLoading}
       submit={() =>
-        presenter.doRegister(
+        presenterRef.current!.doRegister(
           firstName,
           lastName,
           alias,
@@ -153,3 +156,11 @@ const Register = () => {
 };
 
 export default Register;
+
+// const presenter = new RegisterPresenter({
+//   setIsLoading,
+//   displayErrorMessage,
+//   updateUserInfo: (user, authToken, remember) =>
+//     updateUserInfo(user, user, authToken, remember),
+//   navigateTo: (path: string) => navigate(path),
+// });

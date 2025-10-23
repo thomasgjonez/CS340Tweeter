@@ -28,8 +28,8 @@ export class UserInfoPresenter extends Presenter<UserInfoView> {
     await this.doFailureReportingOperation(async () => {
       await Promise.all([
         this.setFollowerStatus(authToken, currentUser, displayedUser),
-        this.setFolloweeCount(authToken, displayedUser),
-        this.setFollowerCount(authToken, displayedUser),
+        this.updateFollowCount(authToken, displayedUser, "followee"),
+        this.updateFollowCount(authToken, displayedUser, "follower"),
       ]);
     }, "load user info");
   }
@@ -51,20 +51,6 @@ export class UserInfoPresenter extends Presenter<UserInfoView> {
         this.view.setIsFollower(isFollower);
       }
     }, "determine follower status ");
-  }
-
-  private async setFollowerCount(
-    authToken: AuthToken,
-    displayedUser: User
-  ): Promise<void> {
-    await this.updateFollowCount(authToken, displayedUser, "follower");
-  }
-
-  private async setFolloweeCount(
-    authToken: AuthToken,
-    displayedUser: User
-  ): Promise<void> {
-    await this.updateFollowCount(authToken, displayedUser, "followee");
   }
 
   public async followDisplayedUser(
@@ -132,3 +118,17 @@ export class UserInfoPresenter extends Presenter<UserInfoView> {
     }, `get ${type}s count`);
   }
 }
+
+// private async setFollowerCount(
+//   authToken: AuthToken,
+//   displayedUser: User
+// ): Promise<void> {
+//   await this.updateFollowCount(authToken, displayedUser, "follower");
+// }
+
+// private async setFolloweeCount(
+//   authToken: AuthToken,
+//   displayedUser: User
+// ): Promise<void> {
+//   await this.updateFollowCount(authToken, displayedUser, "followee");
+// }
