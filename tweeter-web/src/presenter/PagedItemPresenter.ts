@@ -64,7 +64,7 @@ export abstract class PagedItemPresenter<
       this.lastItem =
         newItems.length > 0 ? newItems[newItems.length - 1] : null;
       this.view.addItems(newItems);
-    }, "load followees");
+    }, this.itemDescription());
   }
 
   protected abstract itemDescription(): string;
