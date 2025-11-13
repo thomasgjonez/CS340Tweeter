@@ -61,7 +61,7 @@ export class UserService implements Service {
     userImageBytes: Uint8Array,
     imageFileExtension: string
   ): Promise<[User, AuthToken]> {
-    const base64String = btoa(String.fromCharCode(...userImageBytes));
+    const base64String = await this.toBase64(userImageBytes);
     const request: CreateUserRequest = {
       firstName,
       lastName,
@@ -94,5 +94,18 @@ export class UserService implements Service {
       request
     );
     await new Promise((res) => setTimeout(res, 1000));
+  }
+
+  private async toBase64(bytes: Uint8Array): Promise<string> {
+    const blob = new Blob([bytes]);
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const result = reader.result as string;
+        resolve(result.split(",")[1]);
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
   }
 }
