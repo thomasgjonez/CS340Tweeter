@@ -22,6 +22,8 @@ export type { CreateUserRequest } from "./model/requests/CreateUserRequest";
 export type { LoginUserRequest } from "./model/requests/LoginUserRequest";
 export type { LogoutUserRequest } from "./model/requests/LogoutUserRequest";
 export type { PagedStatusItemRequest } from "./model/requests/PagedStatusItemRequest";
+export type { PostStatusRequest } from "./model/requests/PostStatusRequest";
+export type { TweeterRequest } from "./model/requests/TweeterRequest";
 
 //Responses
 export type { PagedUserItemResponse } from "./model/responses/PagedUserItemResponse";
@@ -32,6 +34,8 @@ export type { GetUserResponse } from "./model/responses/GetUserResponse";
 export type { CreateUserResponse } from "./model/responses/CreateUserResponse";
 export type { LogoutUserResponse } from "./model/responses/LogoutUserResponse";
 export type { PagedStatusItemResponse } from "./model/responses/PagedStatusItemResponse";
+export type { PostStatusResponse } from "./model/responses/PostStatusResponse";
+export type { TweeterResponse } from "./model/responses/TweeterResponse";
 
 //Other
 

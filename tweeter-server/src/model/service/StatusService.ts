@@ -21,10 +21,13 @@ export class StatusService {
     return this.getFakeData(userAlias, pageSize, lastItem);
   }
 
-  public async postStatus(token: string, newStatus: StatusDto): Promise<void> {
+  public async postStatus(
+    token: string,
+    newStatus: StatusDto
+  ): Promise<boolean> {
     // Pause so we can see the logging out message. Remove when connected to the server
     await new Promise((f) => setTimeout(f, 2000));
-
+    return true; // placeholder for when I implement the logic with database
     // TODO: Call the server to post the status
   }
 
