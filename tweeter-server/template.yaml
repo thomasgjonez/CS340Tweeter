@@ -363,7 +363,7 @@ Resources:
           Type: Api
           Properties:
             RestApiId: !Ref tweeterApi
-            Path: /user/login ##### TODO: Set Path
+            Path: /user/logout ##### TODO: Set Path
             Method: POST
 
   getFolloweesFunction:

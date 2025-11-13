@@ -11,6 +11,7 @@ export { AuthToken } from "./model/domain/AuthToken";
 export type { UserDto } from "./model/dto/UserDTO";
 export type { StatusDto } from "./model/dto/StatusDTO";
 export type { PostSegmentDto } from "./model/dto/PostSegmentDTO";
+export type { AuthTokenDto } from "./model/dto/AuthTokenDTO";
 
 //Request
 export type { PagedUserItemRequest } from "./model/requests/PagedUserItemRequest";

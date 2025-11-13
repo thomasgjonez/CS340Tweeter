@@ -6,7 +6,7 @@ export const handler = async (
   request: LogoutUserRequest
 ): Promise<LogoutUserResponse> => {
   const userService = new UserService();
-  userService.logout(request.authToken);
+  userService.logout(request.token);
 
   return {
     success: true,

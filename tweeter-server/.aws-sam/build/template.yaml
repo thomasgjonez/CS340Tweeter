@@ -1024,7 +1024,7 @@ Resources:
           Properties:
             RestApiId:
               Ref: tweeterApi
-            Path: /user/login
+            Path: /user/logout
             Method: POST
       CodeUri: userLogoutFunction
     Metadata:

@@ -5,7 +5,7 @@ export const handler = async (
   request: CreateUserRequest
 ): Promise<CreateUserResponse> => {
   const userService = new UserService();
-  const [user, authToken] = await userService.register(
+  const response = await userService.register(
     request.firstName,
     request.lastName,
     request.alias,
@@ -14,9 +14,5 @@ export const handler = async (
     request.imageFileExtension
   );
 
-  return {
-    success: true,
-    user: user.dto,
-    authToken: authToken,
-  };
+  return response;
 };

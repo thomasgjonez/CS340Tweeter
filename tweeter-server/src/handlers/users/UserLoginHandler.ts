@@ -6,14 +6,7 @@ export const handler = async (
 ): Promise<CreateUserResponse> => {
   //CreateuserResponse contains everything needed for LoginUserResponse
   const userService = new UserService();
-  const [user, authToken] = await userService.login(
-    request.alias,
-    request.password
-  );
+  const response = await userService.login(request.alias, request.password);
 
-  return {
-    success: true,
-    user: user.dto,
-    authToken: authToken,
-  };
+  return response;
 };

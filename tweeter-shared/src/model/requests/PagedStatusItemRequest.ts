@@ -5,5 +5,5 @@ export interface PagedStatusItemRequest extends TweeterRequest {
   readonly token: string;
   readonly alias: string;
   readonly pageSize: number;
-  readonly lastItem: StatusDto;
+  readonly lastItem: StatusDto | null;
 }
