@@ -46,6 +46,7 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       Name: tweeterApi
+      Description: Shared TypeScript modules for all Lambdas
       StageName: prod
       Cors:
         AllowMethods: "'GET,POST,PUT,DELETE'"
@@ -103,63 +104,67 @@ Resources:
           # TODO: ADD MORE ENDPOINT DEFINITIONS HERE
           #
 
-          /user/get: ##### TODO: Change "/user/get" to the actual endpoint URL
+          /user/get:
             post:
               consumes: *commonConsumes
               produces: *commonProduces
+              description: "Gets and returns a User object"
               x-amazon-apigateway-integration:
                 type: aws
                 httpMethod: POST
                 uri:
-                  ##### TODO: Change "userGetFunction" to the actual function name. (Don't delete the $, {}, or .Arn suffix.)
-                  ##### The function name must agree with the "Web API Lambda functions" section below.
                   Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${userGetFunction.Arn}/invocations
                 requestTemplates: *commonRequestTemplates
                 responses: *commonAmazonResponses
               responses: *commonSwaggerResponses
-          /user/create: ##### TODO: Set endpoint URL
+
+          /user/create:
             post:
               consumes: *commonConsumes
               produces: *commonProduces
+              description: "Creates a new user"
               x-amazon-apigateway-integration:
                 type: aws
                 httpMethod: POST
                 uri:
-                  ##### TODO: Set function name
                   Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${userCreateFunction.Arn}/invocations
                 requestTemplates: *commonRequestTemplates
                 responses: *commonAmazonResponses
               responses: *commonSwaggerResponses
-          /user/login: ##### TODO: Set endpoint URL
+
+          /user/login:
             post:
               consumes: *commonConsumes
               produces: *commonProduces
+              description: "Logs in a user"
               x-amazon-apigateway-integration:
                 type: aws
                 httpMethod: POST
                 uri:
-                  ##### TODO: Set function name
                   Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${userLoginFunction.Arn}/invocations
                 requestTemplates: *commonRequestTemplates
                 responses: *commonAmazonResponses
               responses: *commonSwaggerResponses
-          /user/logout: ##### TODO: Set endpoint URL
+
+          /user/logout:
             post:
               consumes: *commonConsumes
               produces: *commonProduces
+              description: "Logs out a user"
               x-amazon-apigateway-integration:
                 type: aws
                 httpMethod: POST
                 uri:
-                  ##### TODO: Set function name
                   Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${userLogoutFunction.Arn}/invocations
                 requestTemplates: *commonRequestTemplates
                 responses: *commonAmazonResponses
               responses: *commonSwaggerResponses
+
           /followee/list:
             post:
               consumes: *commonConsumes
               produces: *commonProduces
+              description: "Gets the list of followees for a user"
               x-amazon-apigateway-integration:
                 type: aws
                 httpMethod: POST
@@ -168,10 +173,12 @@ Resources:
                 requestTemplates: *commonRequestTemplates
                 responses: *commonAmazonResponses
               responses: *commonSwaggerResponses
+
           /follower/list:
             post:
               consumes: *commonConsumes
               produces: *commonProduces
+              description: "Gets the list of followers for a user"
               x-amazon-apigateway-integration:
                 type: aws
                 httpMethod: POST
@@ -180,10 +187,12 @@ Resources:
                 requestTemplates: *commonRequestTemplates
                 responses: *commonAmazonResponses
               responses: *commonSwaggerResponses
+
           /follower/status:
             post:
               consumes: *commonConsumes
               produces: *commonProduces
+              description: "Returns the follower/followee status between two users"
               x-amazon-apigateway-integration:
                 type: aws
                 httpMethod: POST
@@ -192,10 +201,12 @@ Resources:
                 requestTemplates: *commonRequestTemplates
                 responses: *commonAmazonResponses
               responses: *commonSwaggerResponses
+
           /followee/count:
             post:
               consumes: *commonConsumes
               produces: *commonProduces
+              description: "Gets the number of followees for a user"
               x-amazon-apigateway-integration:
                 type: aws
                 httpMethod: POST
@@ -204,10 +215,12 @@ Resources:
                 requestTemplates: *commonRequestTemplates
                 responses: *commonAmazonResponses
               responses: *commonSwaggerResponses
+
           /follower/count:
             post:
               consumes: *commonConsumes
               produces: *commonProduces
+              description: "Gets the number of followers for a user"
               x-amazon-apigateway-integration:
                 type: aws
                 httpMethod: POST
@@ -216,10 +229,12 @@ Resources:
                 requestTemplates: *commonRequestTemplates
                 responses: *commonAmazonResponses
               responses: *commonSwaggerResponses
+
           /follow:
             post:
               consumes: *commonConsumes
               produces: *commonProduces
+              description: "Follows a user"
               x-amazon-apigateway-integration:
                 type: aws
                 httpMethod: POST
@@ -228,10 +243,12 @@ Resources:
                 requestTemplates: *commonRequestTemplates
                 responses: *commonAmazonResponses
               responses: *commonSwaggerResponses
+
           /unfollow:
             post:
               consumes: *commonConsumes
               produces: *commonProduces
+              description: "Unfollows a user"
               x-amazon-apigateway-integration:
                 type: aws
                 httpMethod: POST
@@ -240,10 +257,12 @@ Resources:
                 requestTemplates: *commonRequestTemplates
                 responses: *commonAmazonResponses
               responses: *commonSwaggerResponses
+
           /feed/list:
             post:
               consumes: *commonConsumes
               produces: *commonProduces
+              description: "Gets a page of feed items for the user"
               x-amazon-apigateway-integration:
                 type: aws
                 httpMethod: POST
@@ -252,10 +271,12 @@ Resources:
                 requestTemplates: *commonRequestTemplates
                 responses: *commonAmazonResponses
               responses: *commonSwaggerResponses
+
           /story/list:
             post:
               consumes: *commonConsumes
               produces: *commonProduces
+              description: "Gets a page of story items for the user"
               x-amazon-apigateway-integration:
                 type: aws
                 httpMethod: POST
@@ -264,10 +285,12 @@ Resources:
                 requestTemplates: *commonRequestTemplates
                 responses: *commonAmazonResponses
               responses: *commonSwaggerResponses
+
           /status/upload:
             post:
               consumes: *commonConsumes
               produces: *commonProduces
+              description: "Uploads a new status for the user"
               x-amazon-apigateway-integration:
                 type: aws
                 httpMethod: POST

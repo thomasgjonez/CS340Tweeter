@@ -27,6 +27,7 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       Name: tweeterApi
+      Description: Shared TypeScript modules for all Lambdas
       StageName: prod
       Cors:
         AllowMethods: '''GET,POST,PUT,DELETE'''
@@ -94,6 +95,7 @@ Resources:
               - application/json
               produces:
               - application/json
+              description: Gets and returns a User object
               x-amazon-apigateway-integration:
                 type: aws
                 httpMethod: POST
@@ -154,6 +156,7 @@ Resources:
               - application/json
               produces:
               - application/json
+              description: Creates a new user
               x-amazon-apigateway-integration:
                 type: aws
                 httpMethod: POST
@@ -214,6 +217,7 @@ Resources:
               - application/json
               produces:
               - application/json
+              description: Logs in a user
               x-amazon-apigateway-integration:
                 type: aws
                 httpMethod: POST
@@ -274,6 +278,7 @@ Resources:
               - application/json
               produces:
               - application/json
+              description: Logs out a user
               x-amazon-apigateway-integration:
                 type: aws
                 httpMethod: POST
@@ -334,6 +339,7 @@ Resources:
               - application/json
               produces:
               - application/json
+              description: Gets the list of followees for a user
               x-amazon-apigateway-integration:
                 type: aws
                 httpMethod: POST
@@ -394,6 +400,7 @@ Resources:
               - application/json
               produces:
               - application/json
+              description: Gets the list of followers for a user
               x-amazon-apigateway-integration:
                 type: aws
                 httpMethod: POST
@@ -454,6 +461,7 @@ Resources:
               - application/json
               produces:
               - application/json
+              description: Returns the follower/followee status between two users
               x-amazon-apigateway-integration:
                 type: aws
                 httpMethod: POST
@@ -514,6 +522,7 @@ Resources:
               - application/json
               produces:
               - application/json
+              description: Gets the number of followees for a user
               x-amazon-apigateway-integration:
                 type: aws
                 httpMethod: POST
@@ -574,6 +583,7 @@ Resources:
               - application/json
               produces:
               - application/json
+              description: Gets the number of followers for a user
               x-amazon-apigateway-integration:
                 type: aws
                 httpMethod: POST
@@ -634,6 +644,7 @@ Resources:
               - application/json
               produces:
               - application/json
+              description: Follows a user
               x-amazon-apigateway-integration:
                 type: aws
                 httpMethod: POST
@@ -694,6 +705,7 @@ Resources:
               - application/json
               produces:
               - application/json
+              description: Unfollows a user
               x-amazon-apigateway-integration:
                 type: aws
                 httpMethod: POST
@@ -754,6 +766,7 @@ Resources:
               - application/json
               produces:
               - application/json
+              description: Gets a page of feed items for the user
               x-amazon-apigateway-integration:
                 type: aws
                 httpMethod: POST
@@ -814,6 +827,7 @@ Resources:
               - application/json
               produces:
               - application/json
+              description: Gets a page of story items for the user
               x-amazon-apigateway-integration:
                 type: aws
                 httpMethod: POST
@@ -874,6 +888,7 @@ Resources:
               - application/json
               produces:
               - application/json
+              description: Uploads a new status for the user
               x-amazon-apigateway-integration:
                 type: aws
                 httpMethod: POST

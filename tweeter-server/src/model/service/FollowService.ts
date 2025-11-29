@@ -7,7 +7,6 @@ export class FollowService {
     pageSize: number,
     lastItem: UserDto | null
   ): Promise<[UserDto[], boolean]> {
-    // TODO: Replace with the result of calling server
     return this.getFakeData(lastItem, pageSize, userAlias);
   }
 
@@ -17,7 +16,6 @@ export class FollowService {
     pageSize: number,
     lastItem: UserDto | null
   ): Promise<[UserDto[], boolean]> {
-    // TODO: Replace with the result of calling server
     return this.getFakeData(lastItem, pageSize, userAlias);
   }
   private async getFakeData(
@@ -39,26 +37,18 @@ export class FollowService {
     user: UserDto,
     selectedUser: UserDto
   ): Promise<boolean> {
-    // TODO: Replace with the result of calling server
     return FakeData.instance.isFollower();
   }
   public async getFolloweeCount(token: string, user: UserDto): Promise<number> {
-    // TODO: Replace with the result of calling server
     return FakeData.instance.getFolloweeCount(user.alias);
   }
   public async getFollowerCount(token: string, user: UserDto): Promise<number> {
-    // TODO: Replace with the result of calling server
     return FakeData.instance.getFollowerCount(user.alias);
   }
   public async follow(
     token: string,
     userToFollow: UserDto
   ): Promise<[followerCount: number, followeeCount: number]> {
-    // Pause so we can see the follow message. Remove when connected to the server
-    await new Promise((f) => setTimeout(f, 2000));
-
-    // TODO: Call the server
-
     const followerCount = await this.getFollowerCount(token, userToFollow);
     const followeeCount = await this.getFolloweeCount(token, userToFollow);
 
@@ -68,11 +58,6 @@ export class FollowService {
     token: string,
     userToUnfollow: UserDto
   ): Promise<[followerCount: number, followeeCount: number]> {
-    // Pause so we can see the unfollow message. Remove when connected to the server
-    await new Promise((f) => setTimeout(f, 2000));
-
-    // TODO: Call the server
-
     const followerCount = await this.getFollowerCount(token, userToUnfollow);
     const followeeCount = await this.getFolloweeCount(token, userToUnfollow);
 
