@@ -8,6 +8,7 @@
   "author": "JWilkerson",
   "license": "ISC",
   "dependencies": {
+    "@types/bcryptjs": "^2.4.6",
     "rimraf": "^5.0.5",
     "vite-plugin-dts": "^3.7.3"
   }

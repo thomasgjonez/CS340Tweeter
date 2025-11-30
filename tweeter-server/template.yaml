@@ -611,7 +611,32 @@ Resources:
             WriteCapacityUnits: 1
           Projection:
             ProjectionType: ALL
+  UserTable:
+  Type: AWS::DynamoDB::Table
+  Properties:
+    TableName: User_Table
+    AttributeDefinitions:
+      - AttributeName: alias
+        AttributeType: S
+    KeySchema:
+      - AttributeName: alias
+        KeyType: HASH
+    BillingMode: PROVISIONED
+    ProvisionedThroughput:
+      ReadCapacityUnits: 1
+      WriteCapacityUnits: 1
 
-  #
-  # TODO: ADD MORE TABLE DEFINITIONS HERE
-  #
+AuthTokenTable:
+  Type: AWS::DynamoDB::Table
+  Properties:
+    TableName: AuthToken_Table
+    AttributeDefinitions:
+      - AttributeName: token
+        AttributeType: S
+    KeySchema:
+      - AttributeName: token
+        KeyType: HASH
+    BillingMode: PROVISIONED
+    ProvisionedThroughput:
+      ReadCapacityUnits: 1
+      WriteCapacityUnits: 1

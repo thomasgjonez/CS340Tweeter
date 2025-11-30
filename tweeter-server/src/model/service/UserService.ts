@@ -5,44 +5,105 @@ import {
   User,
   UserDto,
 } from "tweeter-shared";
+import { DAOFactory } from "../../factory/DAOFactory";
+import { AuthorizationService } from "./AuthorizationService";
+import bcrypt from "bcryptjs";
 
 export class UserService {
+  private DAOFactory: DAOFactory;
+  public constructor(DAOFactory: DAOFactory) {
+    this.DAOFactory = DAOFactory;
+  }
+
   public async getUser(token: string, alias: string): Promise<UserDto | null> {
-    // TODO: Replace with the result of calling server
-    const user: User | null = FakeData.instance.findUserByAlias(alias);
+    const authService = new AuthorizationService(this.DAOFactory);
+    const userDAO = this.DAOFactory.makeUserDAO();
 
-    if (!user) {
-      return null;
+    try {
+      //const user: User | null = FakeData.instance.findUserByAlias(alias);
+      await authService.requireAuth(token);
+      const user: User | null = await userDAO.getUser(alias);
+
+      if (!user) {
+        return null;
+      }
+
+      return user.dto;
+    } catch (error) {
+      throw error;
     }
-
-    return user.dto;
   }
   public async login(
     alias: string,
     password: string
   ): Promise<CreateUserResponse> {
-    // 1️⃣ Authenticate user (replace this with your actual DB lookup)
-    const user = FakeData.instance.firstUser;
-    if (user === null) {
+    const userDAO = this.DAOFactory.makeUserDAO();
+    const authDAO = this.DAOFactory.makeAuthTokenDAO();
+    try {
+      //const user = FakeData.instance.firstUser;
+
+      const user = await userDAO.getUser(alias);
+
+      if (!user) {
+        return {
+          success: false,
+          message: "Invalid alias or password",
+          user: null,
+          authToken: null,
+        };
+      }
+
+      // move to authorizatoinService
+      // 2. Validate password
+      const passwordHash = await userDAO.getPasswordHash(alias);
+
+      if (passwordHash === null) {
+        return {
+          success: false,
+          message: "Invalid username or password",
+          user: null,
+          authToken: null,
+        };
+      }
+
+      const correct = bcrypt.compare(password, passwordHash);
+
+      if (!correct) {
+        return {
+          success: false,
+          message: "Invalid alias or password",
+          user: null,
+          authToken: null,
+        };
+      }
+
+      // 3. Create new auth token
+      const authToken = AuthToken.Generate();
+      await authDAO.putToken(alias, authToken);
+
+      // 4. Return success + user DTO
       return {
-        success: false,
-        message: "Invalid alias or password",
-        user: null,
-        authToken: null,
+        success: true,
+        message: "Login successful",
+        user: user.dto,
+        authToken: authToken.dto,
       };
+    } catch (error) {
+      throw error;
     }
-
-    const authToken = AuthToken.Generate();
-
-    const response: CreateUserResponse = {
-      success: true,
-      message: "Login successful",
-      user: user.dto,
-      authToken: authToken.dto,
-    };
-
-    return response;
   }
+
+  //   const authToken = AuthToken.Generate();
+
+  //   const response: CreateUserResponse = {
+  //     success: true,
+  //     message: "Login successful",
+  //     user: user.dto,
+  //     authToken: authToken.dto,
+  //   };
+
+  //   return response;
+  // }
 
   public async register(
     firstName: string,
@@ -52,7 +113,7 @@ export class UserService {
     userImageBytes: Uint8Array,
     imageFileExtension: string
   ): Promise<CreateUserResponse> {
-    // Not neded now, but will be needed when you make the request to the server in milestone 3
+    //make sure you upload image to s3 bucket
     const imageStringBase64: string =
       Buffer.from(userImageBytes).toString("base64");
 

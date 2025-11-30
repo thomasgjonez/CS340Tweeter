@@ -7,9 +7,9 @@ export interface UserDAO {
     alias: string,
     passwordHash: string,
     imageUrl: string
-  ): User | null;
+  ): Promise<User | null>;
 
-  getUser(alias: string): User | null;
+  getUser(alias: string): Promise<User | null>;
 
-  loginUser(alias: string, passwordHash: string): User | null;
+  getPasswordHash(alias: string): Promise<string | null>;
 }
