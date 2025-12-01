@@ -580,10 +580,10 @@ Resources:
           Projection:
             ProjectionType: ALL
 
-  followTable: ##### TODO: Change to match the table name
+  FollowsTable: ##### TODO: Change to match the table name
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: follow ##### TODO: Set the actual table name
+      TableName: Follows ##### TODO: Set the actual table name
       AttributeDefinitions:
         ##### TODO: Add attributes that will be partition or sort keys, including their datatypes (for both table and index)
         - AttributeName: follower_alias
@@ -600,7 +600,7 @@ Resources:
         ReadCapacityUnits: 1
         WriteCapacityUnits: 1
       GlobalSecondaryIndexes:
-        - IndexName: follow_index ##### TODO: Set the actual index name
+        - IndexName: Follows_index ##### TODO: Set the actual index name
           KeySchema:
             - AttributeName: followee_alias ##### TODO: Set index partition key
               KeyType: HASH
@@ -612,31 +612,31 @@ Resources:
           Projection:
             ProjectionType: ALL
   UserTable:
-  Type: AWS::DynamoDB::Table
-  Properties:
-    TableName: User_Table
-    AttributeDefinitions:
-      - AttributeName: alias
-        AttributeType: S
-    KeySchema:
-      - AttributeName: alias
-        KeyType: HASH
-    BillingMode: PROVISIONED
-    ProvisionedThroughput:
-      ReadCapacityUnits: 1
-      WriteCapacityUnits: 1
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: User_Table
+      AttributeDefinitions:
+        - AttributeName: alias
+          AttributeType: S
+      KeySchema:
+        - AttributeName: alias
+          KeyType: HASH
+      BillingMode: PROVISIONED
+      ProvisionedThroughput:
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
 
-AuthTokenTable:
-  Type: AWS::DynamoDB::Table
-  Properties:
-    TableName: AuthToken_Table
-    AttributeDefinitions:
-      - AttributeName: token
-        AttributeType: S
-    KeySchema:
-      - AttributeName: token
-        KeyType: HASH
-    BillingMode: PROVISIONED
-    ProvisionedThroughput:
-      ReadCapacityUnits: 1
-      WriteCapacityUnits: 1
+  AuthTokenTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: AuthToken_Table
+      AttributeDefinitions:
+        - AttributeName: token
+          AttributeType: S
+      KeySchema:
+        - AttributeName: token
+          KeyType: HASH
+      BillingMode: PROVISIONED
+      ProvisionedThroughput:
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1

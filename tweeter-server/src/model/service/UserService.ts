@@ -1,10 +1,4 @@
-import {
-  AuthToken,
-  CreateUserResponse,
-  FakeData,
-  User,
-  UserDto,
-} from "tweeter-shared";
+import { AuthToken, CreateUserResponse, User, UserDto } from "tweeter-shared";
 import { DAOFactory } from "../../factory/DAOFactory";
 import { AuthorizationService } from "./AuthorizationService";
 import bcrypt from "bcryptjs";
@@ -54,7 +48,6 @@ export class UserService {
       }
 
       // move to authorizatoinService
-      // 2. Validate password
       const passwordHash = await userDAO.getPasswordHash(alias);
 
       if (passwordHash === null) {
@@ -66,7 +59,7 @@ export class UserService {
         };
       }
 
-      const correct = bcrypt.compare(password, passwordHash);
+      const correct = await bcrypt.compare(password, passwordHash);
 
       if (!correct) {
         return {
@@ -114,26 +107,70 @@ export class UserService {
     imageFileExtension: string
   ): Promise<CreateUserResponse> {
     //make sure you upload image to s3 bucket
-    const imageStringBase64: string =
-      Buffer.from(userImageBytes).toString("base64");
+    try {
+      const userDAO = this.DAOFactory.makeUserDAO();
+      const authDAO = this.DAOFactory.makeAuthTokenDAO();
 
-    // TODO: Replace with the result of calling the server
-    const user = FakeData.instance.firstUser;
+      if (!alias.startsWith("@")) {
+        throw new Error("Alias must begin with '@'");
+      }
 
-    if (user === null) {
-      throw new Error("Invalid registration");
+      const existingUser = await userDAO.getUser(alias);
+      if (existingUser) {
+        throw new Error("Alias already taken");
+      }
+
+      const imageBase64 = Buffer.from(userImageBytes).toString("base64");
+      const imageUrl = await this.uploadUserImageToS3(
+        alias,
+        imageBase64,
+        imageFileExtension
+      );
+      //need to hash it
+      const passwordHash = await bcrypt.hash(password, 10);
+
+      await userDAO.createUser(
+        firstName,
+        lastName,
+        alias,
+        passwordHash,
+        imageUrl
+      );
+
+      const authToken = AuthToken.Generate();
+      await authDAO.putToken(alias, authToken);
+
+      const user = new User(firstName, lastName, alias, imageUrl);
+      const response: CreateUserResponse = {
+        success: true,
+        message: "Login successful",
+        user: user.dto,
+        authToken: authToken.dto,
+      };
+
+      return response;
+    } catch (error) {
+      throw error;
     }
-    const authToken = AuthToken.Generate();
-
-    const response: CreateUserResponse = {
-      success: true,
-      message: "Login successful",
-      user: user.dto,
-      authToken: authToken.dto,
-    };
-
-    return response;
   }
 
   public async logout(token: string): Promise<void> {}
+
+  private async uploadUserImageToS3(
+    alias: string,
+    imageBase64: string,
+    extension: string
+  ): Promise<string> {
+    try {
+      const s3 = this.DAOFactory.makeS3DAO();
+
+      const key = `profile-images/${alias}.${extension}`;
+
+      await s3.putImage(key, imageBase64, `image/${extension}`);
+
+      return `https://cs340-tweeter-images-tgjones.s3.amazonaws.com/${key}`;
+    } catch (error) {
+      throw error;
+    }
+  }
 }

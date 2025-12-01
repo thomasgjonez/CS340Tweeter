@@ -14,7 +14,7 @@ export class DynamoUserDAO implements UserDAO {
   readonly tableName: string = "User_Table";
 
   private readonly client = DynamoDBDocumentClient.from(
-    new DynamoDBClient({ region: "us-east-2" })
+    new DynamoDBClient({ region: "us-west-2" })
   );
 
   async createUser(

@@ -7,18 +7,20 @@ export class AuthorizationService {
   async requireAuth(tokenString: string): Promise<string> {
     const authDAO = this.factory.makeAuthTokenDAO();
 
-    const token = await authDAO.getToken(tokenString);
-    if (!token) {
+    const result = await authDAO.getToken(tokenString);
+    if (!result) {
       throw new Error("401 Unauthorized");
     }
 
+    const [authToken, alias] = result;
+
     const now = Date.now();
-    const age = now - token.timestamp;
+    const age = now - authToken.timestamp;
 
     if (age > AuthorizationService.THIRTY_DAYS_MS) {
       throw new Error("401 Unauthorized");
     }
 
-    return token.token;
+    return alias;
   }
 }

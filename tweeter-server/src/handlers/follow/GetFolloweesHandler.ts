@@ -1,14 +1,21 @@
-import { PagedUserItemRequest, PagedUserItemResponse} from "tweeter-shared"
-import { FollowService } from "../../model/service/FollowService"
+import { PagedUserItemRequest, PagedUserItemResponse } from "tweeter-shared";
+import { FollowService } from "../../model/service/FollowService";
+import { DynamoDBFactory } from "../../factory/DynamoDBFactory";
 
-export const handler = async (request: PagedUserItemRequest): Promise<PagedUserItemResponse> => {
-    const followService = new FollowService();
-    const [items, hasMore] = await followService.loadMoreFollowees(request.token, request.userAlias, request.pageSize, request.lastItem);
+export const handler = async (
+  request: PagedUserItemRequest
+): Promise<PagedUserItemResponse> => {
+  const followService = new FollowService(new DynamoDBFactory());
+  const [items, hasMore] = await followService.loadMoreFollowees(
+    request.token,
+    request.userAlias,
+    request.pageSize,
+    request.lastItem
+  );
 
-    return {
-        success: true,
-        items: items,
-        hasMore: hasMore
-
-    }
-}
+  return {
+    success: true,
+    items: items,
+    hasMore: hasMore,
+  };
+};

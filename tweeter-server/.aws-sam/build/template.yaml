@@ -1304,10 +1304,10 @@ Resources:
           WriteCapacityUnits: 1
         Projection:
           ProjectionType: ALL
-  followTable:
+  FollowsTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: follow
+      TableName: Follows
       AttributeDefinitions:
       - AttributeName: follower_alias
         AttributeType: S
@@ -1323,7 +1323,7 @@ Resources:
         ReadCapacityUnits: 1
         WriteCapacityUnits: 1
       GlobalSecondaryIndexes:
-      - IndexName: follow_index
+      - IndexName: Follows_index
         KeySchema:
         - AttributeName: followee_alias
           KeyType: HASH
@@ -1334,3 +1334,31 @@ Resources:
           WriteCapacityUnits: 1
         Projection:
           ProjectionType: ALL
+  UserTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: User_Table
+      AttributeDefinitions:
+      - AttributeName: alias
+        AttributeType: S
+      KeySchema:
+      - AttributeName: alias
+        KeyType: HASH
+      BillingMode: PROVISIONED
+      ProvisionedThroughput:
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
+  AuthTokenTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: AuthToken_Table
+      AttributeDefinitions:
+      - AttributeName: token
+        AttributeType: S
+      KeySchema:
+      - AttributeName: token
+        KeyType: HASH
+      BillingMode: PROVISIONED
+      ProvisionedThroughput:
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
