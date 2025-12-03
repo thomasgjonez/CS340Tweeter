@@ -4,8 +4,9 @@ import { S3DAO } from "./S3DAO";
 //make sure bucket is public read
 export class AWSS3DAO implements S3DAO {
   private bucketName = "cs340-tweeter-images-tgjones";
+  private region = "us-west-2";
   private readonly client = new S3Client({
-    region: "us-west-2",
+    region: this.region,
   });
 
   async putImage(
@@ -24,6 +25,8 @@ export class AWSS3DAO implements S3DAO {
 
     await this.client.send(new PutObjectCommand(params));
 
-    return `https://${this.bucketName}.s3.amazonaws.com/${key}`;
+    return `https://${
+      this.bucketName
+    }.s3.us-west-2.amazonaws.com/${encodeURIComponent(key)}`;
   }
 }

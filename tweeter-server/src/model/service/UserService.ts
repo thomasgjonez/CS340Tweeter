@@ -2,9 +2,9 @@ import { AuthToken, CreateUserResponse, User, UserDto } from "tweeter-shared";
 import { DAOFactory } from "../../factory/DAOFactory";
 import { AuthorizationService } from "./AuthorizationService";
 import bcrypt from "bcryptjs";
-
 export class UserService {
   private DAOFactory: DAOFactory;
+
   public constructor(DAOFactory: DAOFactory) {
     this.DAOFactory = DAOFactory;
   }
@@ -14,7 +14,6 @@ export class UserService {
     const userDAO = this.DAOFactory.makeUserDAO();
 
     try {
-      //const user: User | null = FakeData.instance.findUserByAlias(alias);
       await authService.requireAuth(token);
       const user: User | null = await userDAO.getUser(alias);
 
@@ -34,47 +33,27 @@ export class UserService {
     const userDAO = this.DAOFactory.makeUserDAO();
     const authDAO = this.DAOFactory.makeAuthTokenDAO();
     try {
-      //const user = FakeData.instance.firstUser;
-
       const user = await userDAO.getUser(alias);
 
       if (!user) {
-        return {
-          success: false,
-          message: "Invalid alias or password",
-          user: null,
-          authToken: null,
-        };
+        throw new Error("Invalid alias");
       }
 
-      // move to authorizatoinService
       const passwordHash = await userDAO.getPasswordHash(alias);
 
       if (passwordHash === null) {
-        return {
-          success: false,
-          message: "Invalid username or password",
-          user: null,
-          authToken: null,
-        };
+        throw new Error("Invalid password");
       }
 
       const correct = await bcrypt.compare(password, passwordHash);
 
       if (!correct) {
-        return {
-          success: false,
-          message: "Invalid alias or password",
-          user: null,
-          authToken: null,
-        };
+        throw new Error("Invalid password");
       }
 
-      // 3. Create new auth token
       const authToken = AuthToken.Generate();
       await authDAO.putToken(alias, authToken);
 
-      // 4. Return success + user DTO
       return {
         success: true,
         message: "Login successful",
@@ -86,18 +65,6 @@ export class UserService {
     }
   }
 
-  //   const authToken = AuthToken.Generate();
-
-  //   const response: CreateUserResponse = {
-  //     success: true,
-  //     message: "Login successful",
-  //     user: user.dto,
-  //     authToken: authToken.dto,
-  //   };
-
-  //   return response;
-  // }
-
   public async register(
     firstName: string,
     lastName: string,
@@ -106,7 +73,6 @@ export class UserService {
     userImageBytes: Uint8Array,
     imageFileExtension: string
   ): Promise<CreateUserResponse> {
-    //make sure you upload image to s3 bucket
     try {
       const userDAO = this.DAOFactory.makeUserDAO();
       const authDAO = this.DAOFactory.makeAuthTokenDAO();
@@ -126,7 +92,6 @@ export class UserService {
         imageBase64,
         imageFileExtension
       );
-      //need to hash it
       const passwordHash = await bcrypt.hash(password, 10);
 
       await userDAO.createUser(
@@ -154,7 +119,14 @@ export class UserService {
     }
   }
 
-  public async logout(token: string): Promise<void> {}
+  public async logout(token: string): Promise<void> {
+    try {
+      const authDAO = this.DAOFactory.makeAuthTokenDAO();
+      await authDAO.deleteToken(token);
+    } catch (error: any) {
+      throw new Error(`Unable to logout: ${error.message}`);
+    }
+  }
 
   private async uploadUserImageToS3(
     alias: string,
@@ -163,8 +135,9 @@ export class UserService {
   ): Promise<string> {
     try {
       const s3 = this.DAOFactory.makeS3DAO();
+      const cleanAlias = alias.startsWith("@") ? alias.substring(1) : alias;
 
-      const key = `profile-images/${alias}.${extension}`;
+      const key = `profile-images/${cleanAlias}.${extension}`;
 
       await s3.putImage(key, imageBase64, `image/${extension}`);
 

@@ -67,7 +67,7 @@ export class DynamoFollowDAO implements FollowDAO {
       this.followerAliasAttr,
       lastFollowerAlias,
       pageSize,
-      "follows_index"
+      "Follows_index"
     );
   }
   async getPageOfFollowees(
@@ -101,14 +101,14 @@ export class DynamoFollowDAO implements FollowDAO {
   async countFollowers(followeeAlias: string): Promise<number> {
     const params = {
       TableName: this.tableName,
-      KeyConditionExpression: `${this.followerAliasAttr} = :v`,
+      IndexName: "Follows_index",
+      KeyConditionExpression: "followee_alias = :v",
       ExpressionAttributeValues: {
         ":v": { S: followeeAlias },
       },
     };
 
     const data = await this.client.send(new QueryCommand(params));
-
     return data.Items?.length ?? 0;
   }
 
@@ -155,8 +155,8 @@ export class DynamoFollowDAO implements FollowDAO {
       ]);
     });
 
-    const hasMorePages = data.LastEvaluatedKey !== undefined;
+    const hasMore = data.LastEvaluatedKey !== undefined;
 
-    return new DataPage(items, hasMorePages);
+    return new DataPage(items, hasMore);
   }
 }

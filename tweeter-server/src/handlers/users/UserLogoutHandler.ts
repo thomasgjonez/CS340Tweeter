@@ -6,10 +6,17 @@ import { DynamoDBFactory } from "../../factory/DynamoDBFactory";
 export const handler = async (
   request: LogoutUserRequest
 ): Promise<LogoutUserResponse> => {
-  const userService = new UserService(new DynamoDBFactory());
-  userService.logout(request.token);
+  try {
+    const userService = new UserService(new DynamoDBFactory());
+    userService.logout(request.token);
 
-  return {
-    success: true,
-  };
+    return {
+      success: true,
+    };
+  } catch (error: any) {
+    return {
+      success: false,
+      message: error.message ?? "unknown error occured",
+    };
+  }
 };

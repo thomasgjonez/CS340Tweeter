@@ -640,3 +640,40 @@ Resources:
       ProvisionedThroughput:
         ReadCapacityUnits: 1
         WriteCapacityUnits: 1
+  StoryTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: Story_Table
+      AttributeDefinitions:
+        - AttributeName: author
+          AttributeType: S
+        - AttributeName: timeStamp
+          AttributeType: N
+      KeySchema:
+        - AttributeName: author
+          KeyType: HASH
+        - AttributeName: timeStamp
+          KeyType: RANGE
+      BillingMode: PROVISIONED
+      ProvisionedThroughput:
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
+
+  FeedTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: Feed_Table
+      AttributeDefinitions:
+        - AttributeName: alias
+          AttributeType: S
+        - AttributeName: timeStamp
+          AttributeType: N
+      KeySchema:
+        - AttributeName: alias
+          KeyType: HASH
+        - AttributeName: timeStamp
+          KeyType: RANGE
+      BillingMode: PROVISIONED
+      ProvisionedThroughput:
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
