@@ -7,10 +7,14 @@ import { DataPage } from "../../DataPage";
 export class StatusService {
   private DAOFactory: DAOFactory;
   private authService: AuthorizationService;
+  private feedDAO: StatusDAO;
+  private storyDAO: StatusDAO;
 
   public constructor(DAOFactory: DAOFactory) {
     this.DAOFactory = DAOFactory;
     this.authService = new AuthorizationService(this.DAOFactory);
+    this.feedDAO = this.DAOFactory.makeFeedDAO();
+    this.storyDAO = this.DAOFactory.makeStoryDAO();
   }
   public async loadMoreFeedItems(
     token: string,
@@ -19,14 +23,13 @@ export class StatusService {
     lastItem: StatusDto | null
   ): Promise<[StatusDto[], boolean]> {
     try {
-      const feedDAO = this.DAOFactory.makeFeedDAO();
       return this.getData(
         token,
         userAlias,
         pageSize,
         lastItem,
         (userAlias, pageSize, lastItem) =>
-          feedDAO.getPageOfStatuses(userAlias, pageSize, lastItem)
+          this.feedDAO.getPageOfStatuses(userAlias, pageSize, lastItem)
       );
     } catch (error: any) {
       throw new Error(`Unable to load feed items: ${error.message}`);
@@ -40,14 +43,13 @@ export class StatusService {
     lastItem: StatusDto | null
   ): Promise<[StatusDto[], boolean]> {
     try {
-      const storyDAO = this.DAOFactory.makeStoryDAO();
       return this.getData(
         token,
         userAlias,
         pageSize,
         lastItem,
         (userAlias, pageSize, lastItem) =>
-          storyDAO.getPageOfStatuses(userAlias, pageSize, lastItem)
+          this.storyDAO.getPageOfStatuses(userAlias, pageSize, lastItem)
       );
     } catch (error: any) {
       throw new Error(`Unable to load story items: ${error.message}`);
@@ -59,15 +61,25 @@ export class StatusService {
     newStatus: StatusDto
   ): Promise<boolean> {
     try {
-      const loggedInUser = await this.authService.requireAuth(token);
-      const storyDAO = this.DAOFactory.makeStoryDAO();
-      const feedDAO = this.DAOFactory.makeFeedDAO();
-      await storyDAO.putStoryStatus(newStatus);
+      await this.authService.requireAuth(token);
+      //const feedDAO = this.DAOFactory.makeFeedDAO();
+      await this.storyDAO.putStoryStatus(newStatus);
 
-      await this.postToFollowersFeed(loggedInUser, newStatus, feedDAO);
+      //await this.postToFollowersFeed(loggedInUser, newStatus, feedDAO); // not needed in this function call, will be taken care in queues
       return true; //returns true if it was succesful as in no errors were thrown
     } catch (error: any) {
       throw new Error(`Unable to post status: ${error.message}`);
+    }
+  }
+
+  public async fanOutToFollowers(
+    newStatus: StatusDto,
+    followers: string[]
+  ): Promise<void> {
+    try {
+      await this.feedDAO.batchPutFeedStatuses(followers, newStatus);
+    } catch (error: any) {
+      throw new Error("Unable to update feeds: " + error.message);
     }
   }
 
@@ -91,28 +103,28 @@ export class StatusService {
     }
   }
 
-  private async postToFollowersFeed(
-    loggedInUser: string,
-    newStatus: StatusDto,
-    statusDAO: StatusDAO
-  ) {
-    try {
-      const followDAO = this.DAOFactory.makeFollowDAO();
+  // public async postToFollowersFeed(
+  //   loggedInUser: string,
+  //   newStatus: StatusDto,
+  //   statusDAO: StatusDAO
+  // ) {
+  //   try {
+  //     const followDAO = this.DAOFactory.makeFollowDAO();
 
-      const followers = await followDAO.getPageOfFollowers(
-        loggedInUser,
-        25,
-        undefined
-      );
-      for (const follows of followers.values) {
-        const feedStatus: StatusDto = {
-          ...newStatus,
-          user: newStatus.user,
-        };
-        await statusDAO.putFeedStatus(follows[0], feedStatus); //follows[0] is the follower or partition key I'll use
-      }
-    } catch (error: any) {
-      throw new Error(`Unable to update follower's feeds: ${error.message}`);
-    }
-  }
+  //     const followers = await followDAO.getPageOfFollowers(
+  //       loggedInUser,
+  //       25,
+  //       undefined
+  //     );
+  //     for (const follows of followers.values) {
+  //       const feedStatus: StatusDto = {
+  //         ...newStatus,
+  //         user: newStatus.user,
+  //       };
+  //       await statusDAO.putFeedStatus(follows[0], feedStatus); //follows[0] is the follower or partition key I'll use
+  //     }
+  //   } catch (error: any) {
+  //     throw new Error(`Unable to update follower's feeds: ${error.message}`);
+  //   }
+  // }
 }

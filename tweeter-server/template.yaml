@@ -520,27 +520,57 @@ Resources:
             RestApiId: !Ref tweeterApi
             Path: /status/upload
             Method: POST
+      Environment:
+        Variables:
+          FIND_FOLLOWERS_QUEUE_URL: !Ref FindFollowersQueue
 
-  #
-  # TODO: ADD MORE WEB API LAMBDA DEFINITIONS HERE
-  #
+    #
+    # TODO: ADD MORE WEB API LAMBDA DEFINITIONS HERE
+    #
 
-  #
-  # SQS Queue Lambda Functions  (This will become relevant in Milestone 4. For M3, leave this section commented out.)
-  #
+    #
+    # SQS Queue Lambda Functions  (This will become relevant in Milestone 4. For M3, leave this section commented out.)
+    #
 
-  #   MyQueueFunction:
-  #     Type: AWS::Serverless::Function
-  #     Properties:
-  #       FunctionName: MyQueueFunction
-  #       Handler: <PATH TO LAMBDA HANDLER>
-  #       Policies: *commonPolicies
-  #       Events:
-  #         SQSTrigger:
-  #           Type: SQS
-  #           Properties:
-  #             Queue: !GetAtt MyQueue.Arn
-  #             Enabled: true
+  findFollowersQueueFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: findFollowersQueueFunction
+      Handler: src/handlers/SQS/findFollowersHandler.handler
+      Policies: *commonPolicies
+      Environment:
+        Variables:
+          POPULATE_FEED_QUEUE_URL: !Ref PopulateFeedQueue
+      Events:
+        SQSTrigger:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt FindFollowersQueue.Arn
+            Enabled: true
+  populateFeedQueueFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: populateFeedQueueFunction
+      Handler: src/handlers/SQS/populateFeedHandler.handler
+      Policies: *commonPolicies
+      Environment:
+        Variables:
+          FEED_TABLE_NAME: !Ref FeedTable
+      Events:
+        SQSTrigger:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt PopulateFeedQueue.Arn
+            Enabled: true
+  FindFollowersQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: FindFollowersQueue
+
+  PopulateFeedQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: PopulateFeedQueue
 
   #
   # DynamoDB Tables

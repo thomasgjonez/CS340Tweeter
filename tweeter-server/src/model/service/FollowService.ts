@@ -141,6 +141,16 @@ export class FollowService {
     }
   }
 
+  public async getAllFollowers(userAlias: string): Promise<string[]> {
+    try {
+      const followDAO = this.DAOFactory.makeFollowDAO();
+      const result = followDAO.getAllFollowers(userAlias);
+      return result;
+    } catch (error: any) {
+      throw new Error(`Unable to get all Followers: ${error.message}`);
+    }
+  }
+
   private async updateFollowState(
     token: string,
     targetUser: UserDto,

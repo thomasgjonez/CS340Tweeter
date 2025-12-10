@@ -20,4 +20,5 @@ export interface FollowDAO {
   ): Promise<DataPage<[string, string]>>;
   countFollowees(followerAlias: string): Promise<number>;
   countFollowers(followeeAlias: string): Promise<number>;
+  getAllFollowers(userAlias: string): Promise<string[]>;
 }

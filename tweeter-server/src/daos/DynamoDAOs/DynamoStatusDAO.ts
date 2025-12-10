@@ -5,6 +5,7 @@ import {
   DynamoDBDocumentClient,
   PutCommand,
   QueryCommand,
+  BatchWriteCommand,
 } from "@aws-sdk/lib-dynamodb";
 import { DataPage } from "../../DataPage";
 
@@ -53,6 +54,33 @@ export class DynamoStatusDAO implements StatusDAO {
     };
 
     await this.client.send(new PutCommand(params));
+  }
+  async batchPutFeedStatuses(
+    followerAliases: string[],
+    status: StatusDto
+  ): Promise<void> {
+    const requests = followerAliases.map((alias) => ({
+      PutRequest: {
+        Item: {
+          alias: alias,
+          timeStamp: status.timestamp,
+          post: status.post,
+          segment: status.segments,
+          author: status.user.alias,
+          firstName: status.user.firstName,
+          lastName: status.user.lastName,
+          userImageUrl: status.user.imageURL,
+        },
+      },
+    }));
+
+    const params = {
+      RequestItems: {
+        [this.tableName]: requests,
+      },
+    };
+
+    await this.client.send(new BatchWriteCommand(params));
   }
 
   async getPageOfStatuses(

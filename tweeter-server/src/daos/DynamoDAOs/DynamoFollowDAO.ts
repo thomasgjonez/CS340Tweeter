@@ -112,6 +112,32 @@ export class DynamoFollowDAO implements FollowDAO {
     return data.Items?.length ?? 0;
   }
 
+  async getAllFollowers(alias: string): Promise<string[]> {
+    const params = {
+      TableName: this.tableName,
+      IndexName: "Follows_index", // "Follows_index"
+      KeyConditionExpression: "followee_alias = :v",
+      ExpressionAttributeValues: {
+        ":v": { S: alias },
+      },
+    };
+
+    const result = await this.client.send(new QueryCommand(params));
+
+    return (
+      result.Items?.map((item) => {
+        const val = item[this.followerAliasAttr];
+
+        if (typeof val === "string") return val; // DocumentClient case
+        if (val?.S) return val.S; // raw Dynamo case
+
+        throw new Error(
+          "Unexpected follower_alias format: " + JSON.stringify(val)
+        );
+      }) ?? []
+    );
+  }
+
   private generateFollowKey(followerAlias: string, followeeAlias: string) {
     return {
       [this.followerAliasAttr]: followerAlias,
