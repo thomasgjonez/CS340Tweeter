@@ -1,26 +1,100 @@
-# Tweeter-Web
+# Tweeter — Scalable Social Media Platform
 
-A starter project for the Tweeter Web application.
+Tweeter is a Twitter-like social media application designed to explore **scalable backend architecture**, **cloud-native services**, and **performance-oriented data modeling**. The project emphasizes distributed systems concepts such as asynchronous processing, feed fan-out, and capacity planning.
 
-## Setting Up the Project
+---
 
-1. cd into the project root folder
-1. Run 'npm install'
-1. cd into the tweeter-shared folder
-1. Run 'npm install'
-1. Run 'npm run build'
-1. cd into the tweeter-web folder
-1. Run 'npm install'
-1. Run 'npm run build'
+## Features
 
-**Note:** VS Code seems to have a bug. After doing this, you should be able to run the project but code editors report that they can't see the 'tweeter-shared' module. Restarting VS Code fixes the problem. You will likely need to restart VS Code every time you compile or build the 'tweeter-shared' module.
+- User authentication and session management
+- Follow / unfollow functionality
+- Posting statuses (stories)
+- Feed generation with optimized read performance
+- Support for users with **high follower counts (10K+)**
+- Serverless backend architecture
 
-**Note:** If you are using Windows, make sure to use a Git Bash terminal instead of Windows Powershell. Otherwise, the scripts won't run properly in tweeter-shared and it will cause errors when building tweeter-web.
+---
 
-## Rebuilding the Project
+## Architecture Overview
 
-Rebuild either module of the project (tweeter-shared or tweeter-web) by running 'npm run build' after making any code or configuration changes in the module. The 'tweeter-web' module is dependent on 'tweeter-shared', so if you change 'tweeter-shared' you will also need to rebuild 'tweeter-web'. After rebuilding 'tweeter-shared' you will likely need to restart VS Code (see note above under 'Setting Up the Project').
+Tweeter follows a **layered architecture** to enforce separation of concerns:
 
-## Running the Project
+Client (MVP)
+└── Presenter
+└── Service
+└── DAO
+└── AWS Infrastructure
 
-Run the project by running 'npm start' from within the 'tweeter-web' folder.
+
+### Key Design Decisions
+
+- **Serverless Backend**  
+  All backend endpoints are implemented as AWS Lambda functions behind API Gateway, enabling horizontal scalability without server management.
+
+- **Asynchronous Feed Fan-Out**  
+  Instead of generating feeds on read, Tweeter pre-computes feeds at write time using **Amazon SQS**. This dramatically reduces read latency for users with large follow lists.
+
+- **Optimized DynamoDB Access Patterns**  
+  Data is modeled to minimize queries and leverage partition/sort keys for efficient access to:
+  - User stories
+  - User feeds
+  - Follower and followee relationships
+  - Authentication tokens
+
+---
+
+## AWS Services Used
+
+- **AWS Lambda** — Stateless backend compute
+- **Amazon API Gateway** — REST API endpoints
+- **Amazon DynamoDB** — NoSQL data storage
+- **Amazon SQS** — Asynchronous message queue for feed fan-out
+
+---
+
+## Testing
+
+- Automated **integration tests** written with **Jest**
+- Mocking and verification using **ts-mockito**
+- Tests validate:
+  - Status posting
+  - Feed correctness
+  - End-to-end request flows
+
+---
+
+## Performance & Scalability
+
+- Designed to handle users with **10,000+ followers**
+- Uses **batched writes (up to 25 items)** to maximize DynamoDB throughput
+- Avoids expensive read-time joins by shifting work to asynchronous write paths
+- Capacity planning informed by expected write/read workloads
+
+---
+
+## Tech Stack
+
+- **TypeScript**
+- **Node.js**
+- **AWS Lambda**
+- **DynamoDB**
+- **SQS**
+- **Jest / ts-mockito**
+
+---
+
+## Learning Outcomes
+
+This project provided hands-on experience with:
+
+- Designing scalable cloud architectures
+- Modeling data for NoSQL databases
+- Handling high fan-out workloads efficiently
+- Writing testable, layered backend systems
+- Reasoning about performance tradeoffs in distributed systems
+
+---
+
+## Notes
+
+This project was built as a full-stack, production-style system with an emphasis on **backend scalability, correctness, and performance**, rather than UI polish.
