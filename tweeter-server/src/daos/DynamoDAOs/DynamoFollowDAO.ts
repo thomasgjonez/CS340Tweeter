@@ -113,29 +113,38 @@ export class DynamoFollowDAO implements FollowDAO {
   }
 
   async getAllFollowers(alias: string): Promise<string[]> {
-    const params = {
-      TableName: this.tableName,
-      IndexName: "Follows_index", // "Follows_index"
-      KeyConditionExpression: "followee_alias = :v",
-      ExpressionAttributeValues: {
-        ":v": { S: alias },
-      },
-    };
+    const followers: string[] = [];
 
-    const result = await this.client.send(new QueryCommand(params));
+    let ExclusiveStartKey = undefined;
 
-    return (
-      result.Items?.map((item) => {
+    do {
+      const params: any = {
+        TableName: this.tableName,
+        IndexName: "Follows_index",
+        KeyConditionExpression: "followee_alias = :v",
+        ExpressionAttributeValues: {
+          ":v": { S: alias },
+        },
+        ExclusiveStartKey,
+      };
+
+      const result = await this.client.send(new QueryCommand(params));
+
+      // Extract followers safely (works for both DocumentClient or raw client output)
+      for (const item of result.Items ?? []) {
         const val = item[this.followerAliasAttr];
+        if (typeof val === "string") followers.push(val);
+        else if (val?.S) followers.push(val.S);
+        else
+          throw new Error(
+            "Unexpected follower_alias format: " + JSON.stringify(val)
+          );
+      }
 
-        if (typeof val === "string") return val; // DocumentClient case
-        if (val?.S) return val.S; // raw Dynamo case
+      ExclusiveStartKey = result.LastEvaluatedKey;
+    } while (ExclusiveStartKey);
 
-        throw new Error(
-          "Unexpected follower_alias format: " + JSON.stringify(val)
-        );
-      }) ?? []
-    );
+    return followers;
   }
 
   private generateFollowKey(followerAlias: string, followeeAlias: string) {

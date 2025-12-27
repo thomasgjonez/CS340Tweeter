@@ -118,8 +118,8 @@ export class FollowService {
   public async getFollowerCount(token: string, user: UserDto): Promise<number> {
     const followDAO = this.DAOFactory.makeFollowDAO();
     await this.authService.requireAuth(token);
-    const result = await followDAO.countFollowers(user.alias);
-    return result;
+    const result = await followDAO.getAllFollowers(user.alias);
+    return result.length;
   }
 
   public async follow(token: string, user: UserDto): Promise<[number, number]> {

@@ -7,7 +7,9 @@ export const handler = async (
 ): Promise<CreateUserResponse> => {
   try {
     const userService = new UserService(new DynamoDBFactory());
-    const imageBytes = Buffer.from(request.userImageBase64, "base64");
+    const imageBytes = new Uint8Array(
+      Buffer.from(request.userImageBase64, "base64")
+    );
     const response = await userService.register(
       request.firstName,
       request.lastName,
